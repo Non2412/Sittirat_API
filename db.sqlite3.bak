@@ -1,0 +1,10 @@
+python - <<'PY'
+import sqlite3, pathlib
+db = pathlib.Path('db.sqlite3')
+if not db.exists():
+    print('db.sqlite3 not found in current dir')
+else:
+    c=sqlite3.connect(str(db)); cur=c.cursor()
+    print(cur.execute(\"SELECT name FROM sqlite_master WHERE type='table';\").fetchall())
+    c.close()
+PY

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',  # เพิ่มสำหรับ REST API
+    'rest_framework.authtoken',  # สำหรับ token auth
     'corsheaders',     # เพิ่มสำหรับ CORS (ถ้าจะใช้กับ frontend)
     'api',             # เพิ่ม app ที่เราจะสร้าง
     'myapp',
