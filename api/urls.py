@@ -1,16 +1,36 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TouristAttractionViewSet, AccommodationViewSet, TourPackageViewSet
-from .auth_views import register, login_view
 
+from api import auth_views
+from . import views
 
 router = DefaultRouter()
-router.register(r'attractions', TouristAttractionViewSet, basename='attraction')
-router.register(r'accommodations', AccommodationViewSet, basename='accommodation')
-router.register(r'tour-packages', TourPackageViewSet, basename='tourpackage')
+router.register(r'attractions', views.TouristAttractionViewSet)
+router.register(r'accommodations', views.AccommodationViewSet)
+router.register(r'tour-packages', views.TourPackageViewSet)
+router.register(r'tourists', views.TouristViewSet)
+router.register(r'bookings', views.BookingViewSet)
+router.register(r'reviews', views.ReviewViewSet)
 
 urlpatterns = [
+    # Router URLs
     path('', include(router.urls)),
-    path('register/', register, name='api-register'),
-    path('login/', login_view, name='api-login'),
+
+        # Authentication URLs
+    path('auth/register/', auth_views.register_view, name='register'),
+    path('auth/login/', auth_views.login_view, name='login'),
+    path('auth/logout/', auth_views.logout_view, name='logout'),
+    path('auth/profile/', auth_views.profile_view, name='profile'),
+    
+    # Dashboard และสถิติ
+    path('dashboard/stats/', views.dashboard_stats, name='dashboard-stats'),
+    path('dashboard/popular-destinations/', views.popular_destinations, name='popular-destinations'),
+    path('dashboard/district-stats/', views.district_stats, name='district-stats'),
+    path('dashboard/booking-trends/', views.booking_trends, name='booking-trends'),
+    path('dashboard/accommodation-availability/', views.accommodation_availability, name='accommodation-availability'),
+    path('dashboard/sisaket-highlights/', views.sisaket_highlights, name='sisaket-highlights'),
+    
+    # การจอง
+    path('bookings/accommodation/create/', views.create_accommodation_booking, name='create-accommodation-booking'),
+    path('bookings/tour/create/', views.create_tour_booking, name='create-tour-booking'),
 ]

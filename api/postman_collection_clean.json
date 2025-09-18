@@ -1,0 +1,29 @@
+{
+  "info": {
+    "name": "Si Sa Ket Travel App API - Clean",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Clean minimal collection. Import this in Postman and use the provided environment."
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"sittirat\",\n  \"password\": \"Sittiratsp2412\"\n}" },
+            "url": { "raw": "{{base_url}}/api/login/", "host": ["{{base_url}}"], "path": ["api", "login"] }
+          },
+          "event": [ { "listen": "test", "script": { "exec": [ "try {", " var json = pm.response.json();", " if (json.token) pm.environment.set('token', json.token);", " else if (json.access_token) pm.environment.set('token', json.access_token);", "} catch (e) { console.log('no token'); }" ] } } ]
+        }
+      ]
+    },
+    { "name": "Attractions", "item": [ { "name": "GET List - Attractions", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Token {{token}}" } ], "url": { "raw": "{{base_url}}/api/attractions/" } } } ] }
+  ]
+}
