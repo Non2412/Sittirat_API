@@ -15,7 +15,6 @@ from .serializers import (
 )
 
 
-
 class TouristAttractionViewSet(viewsets.ModelViewSet):
     queryset = TouristAttraction.objects.all()
     serializer_class = TouristAttractionSerializer
@@ -33,7 +32,7 @@ class TouristAttractionViewSet(viewsets.ModelViewSet):
         district = request.query_params.get('district', '')
         min_rating = request.query_params.get('min_rating', 0)
 
-        attractions = TouristAttraction.objects.filter(is_active=True)
+        attractions = TouristAttraction.category.filter(is_active=True)
 
         if query:
             attractions = attractions.filter(
@@ -252,23 +251,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
 def dashboard_stats(request):
     """สถิติสำหรับ Dashboard"""
     stats = {
-        'total_attractions': TouristAttraction.objects.count(),
-        'active_attractions': TouristAttraction.objects.filter(is_active=True).count(),
-        'total_accommodations': Accommodation.objects.count(),
-        'available_accommodations': Accommodation.objects.filter(is_active=True, available_rooms__gt=0).count(),
-        'total_tour_packages': TourPackage.objects.count(),
-        'active_tour_packages': TourPackage.objects.filter(is_active=True).count(),
-        'total_tourists': Tourist.objects.count(),
+        'total_attractions': TouristAttraction.objects.filter(is_active=True).count(),
+        'total_accommodations': Accommodation.objects.filter(is_active=True).count(),
+        'total_tour_packages': TourPackage.objects.filter(is_active=True).count(),
         'total_bookings': Booking.objects.count(),
+        'total_revenue': Booking.objects.aggregate(total=Sum('total_amount'))['total'] or 0,
+        'average_accommodation_rating': Accommodation.objects.filter(is_active=True).aggregate(avg=Avg('rating'))['avg'] or 0,
+        'average_tour_package_rating': TourPackage.objects.filter(is_active=True).aggregate(avg=Avg('rating'))['avg'] or 0,
         'pending_bookings': Booking.objects.filter(status='pending').count(),
         'confirmed_bookings': Booking.objects.filter(status='confirmed').count(),
-        'total_revenue': Booking.objects.filter(status__in=['paid', 'completed']).aggregate(
-            total=Sum('total_amount')
-        )['total'] or 0,
-        'monthly_bookings': Booking.objects.filter(
-            created_at__month=timezone.now().month,
-            created_at__year=timezone.now().year
-        ).count(),
+        'paid_bookings': Booking.objects.filter(status='paid').count(),
+        'completed_bookings': Booking.objects.filter(status='completed').count(),
+        'cancelled_bookings': Booking.objects.filter(status='cancelled').count(),
     }
     return Response(stats)
 

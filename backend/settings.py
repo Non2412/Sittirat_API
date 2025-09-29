@@ -30,14 +30,6 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-def new_func():
-    return ('ชื่อผู้ดูแล', 'ctf2547@gmail.com')
-    ('รหัสผ่าน', 'Sittiratsp2412')
-
-ADMINS = [
-    new_func()  # เพิ่มรหัสผ่านสำหรับผู้ดูแล,
-]
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',  # เพิ่มสำหรับ REST API
-    'rest_framework.authtoken',  # สำหรับ token auth
+    'rest_framework.authtoken',  # เพิ่มสำหรับ Token Authentication
     'corsheaders',     # เพิ่มสำหรับ CORS (ถ้าจะใช้กับ frontend)
     'api',             # เพิ่ม app ที่เราจะสร้าง
 ]
@@ -146,6 +138,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
@@ -153,6 +146,7 @@ REST_FRAMEWORK = {
 
 # CORS settings (สำหรับ frontend)
 CORS_ALLOW_ALL_ORIGINS = True  # เฉพาะ development
+CORS_ALLOW_CREDENTIALS = True
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:3000",  # สำหรับ React
 #     "http://127.0.0.1:3000",

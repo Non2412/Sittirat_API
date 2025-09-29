@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import TouristAttraction, Accommodation, TourPackage, Tourist, Booking, Review
 
+
 @admin.register(TouristAttraction)
 class TouristAttractionAdmin(admin.ModelAdmin):
     list_display = ['name', 'category', 'district', 'rating', 'entrance_fee', 'is_active', 'created_at']

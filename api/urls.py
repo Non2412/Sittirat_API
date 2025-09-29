@@ -1,8 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
-from api import auth_views
 from . import views
+from .auth_views import register, login_view  
 
 router = DefaultRouter()
 router.register(r'attractions', views.TouristAttractionViewSet)
@@ -15,12 +14,10 @@ router.register(r'reviews', views.ReviewViewSet)
 urlpatterns = [
     # Router URLs
     path('', include(router.urls)),
-
-        # Authentication URLs
-    path('auth/register/', auth_views.register_view, name='register'),
-    path('auth/login/', auth_views.login_view, name='login'),
-    path('auth/logout/', auth_views.logout_view, name='logout'),
-    path('auth/profile/', auth_views.profile_view, name='profile'),
+    
+    # Authentication URLs
+    path('auth/register/', register, name='register'),
+    path('auth/login/', login_view, name='login'),
     
     # Dashboard และสถิติ
     path('dashboard/stats/', views.dashboard_stats, name='dashboard-stats'),

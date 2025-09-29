@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone 
+from django.db.models import Count
+
 
 class TouristAttraction(models.Model):
     CATEGORY_CHOICES = [
@@ -100,8 +103,9 @@ class TourPackage(models.Model):
         verbose_name_plural = "แพ็คเกจทัวร์"
         ordering = ['-rating', 'name']
 
-    def __str__(self):
-        return f"{self.name} ({self.get_duration_display()})"
+    def get_duration_display(self) -> str:
+        # ให้ static checker รู้จัก และ fallback ใช้ค่า label จาก DURATION_CHOICES
+        return dict(self.DURATION_CHOICES).get(self.duration, self.duration)
 
 class Tourist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -162,7 +166,7 @@ class Booking(models.Model):
     def __str__(self):
         if self.booking_type == 'accommodation':
             return f"จองที่พัก: {self.accommodation.name} - {self.tourist.user.username}"
-        else:
+        elif self.booking_type == 'tour_package':
             return f"จองทัวร์: {self.tour_package.name} - {self.tourist.user.username}"
 
 class Review(models.Model):
