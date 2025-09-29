@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',  # สำหรับ token auth
     'corsheaders',     # เพิ่มสำหรับ CORS (ถ้าจะใช้กับ frontend)
     'api',             # เพิ่ม app ที่เราจะสร้าง
-    'myapp',
 ]
 
 MIDDLEWARE = [
