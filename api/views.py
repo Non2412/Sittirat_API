@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Count, Sum, Avg, QuerySet
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -18,6 +19,7 @@ from .serializers import (
 class TouristAttractionViewSet(viewsets.ModelViewSet):
     queryset = TouristAttraction.objects.all()
     serializer_class = TouristAttractionSerializer
+    permission_classes = [AllowAny]  # เปิดให้ดูได้ทุกคน
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -195,6 +197,7 @@ class TouristViewSet(viewsets.ModelViewSet):
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticated]  # ต้อง login ก่อน
 
     @action(detail=True, methods=['patch'])
     def update_status(self, request, pk=None):
