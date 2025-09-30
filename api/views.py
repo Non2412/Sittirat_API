@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
-from django.db.models import Q, Count, Sum, Avg
+from django.db.models import Count, Sum, Avg
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.db.models.functions import TruncDate
@@ -32,15 +32,20 @@ class TouristAttractionViewSet(viewsets.ModelViewSet):
         district = request.query_params.get('district', '')
         min_rating = request.query_params.get('min_rating', 0)
 
-        attractions = TouristAttraction.category.filter(is_active=True)
+        attractions = TouristAttraction.objects.filter(is_active=True)
 
+        # ✅ ไม่ใช้ Q object - ใช้การ filter หลายครั้งแทน
         if query:
-            attractions = attractions.filter(
-                Q(name__icontains=query) |
-                Q(description__icontains=query) |
-                Q(district__icontains=query) |
-                Q(subdistrict__icontains=query)
-            )
+            # สร้าง queryset ว่างเพื่อรวมผลลัพธ์
+            filtered_attractions = TouristAttraction.objects.none()
+            
+            # ค้นหาในแต่ละ field แล้วรวมกัน (OR logic)
+            filtered_attractions = filtered_attractions | attractions.filter(name__icontains=query)
+            filtered_attractions = filtered_attractions | attractions.filter(description__icontains=query)
+            filtered_attractions = filtered_attractions | attractions.filter(district__icontains=query)
+            filtered_attractions = filtered_attractions | attractions.filter(subdistrict__icontains=query)
+            
+            attractions = filtered_attractions.distinct()
 
         if category:
             attractions = attractions.filter(category=category)
@@ -98,12 +103,15 @@ class AccommodationViewSet(viewsets.ModelViewSet):
         accommodations = Accommodation.objects.filter(
             is_active=True, available_rooms__gt=0)
 
+        # ✅ ไม่ใช้ Q object
         if query:
-            accommodations = accommodations.filter(
-                Q(name__icontains=query) |
-                Q(description__icontains=query) |
-                Q(district__icontains=query)
-            )
+            filtered_accommodations = Accommodation.objects.none()
+            
+            filtered_accommodations = filtered_accommodations | accommodations.filter(name__icontains=query)
+            filtered_accommodations = filtered_accommodations | accommodations.filter(description__icontains=query)
+            filtered_accommodations = filtered_accommodations | accommodations.filter(district__icontains=query)
+            
+            accommodations = filtered_accommodations.distinct()
 
         if type_filter:
             accommodations = accommodations.filter(type=type_filter)
@@ -150,11 +158,14 @@ class TourPackageViewSet(viewsets.ModelViewSet):
 
         packages = TourPackage.objects.filter(is_active=True)
 
+        # ✅ ไม่ใช้ Q object
         if query:
-            packages = packages.filter(
-                Q(name__icontains=query) |
-                Q(description__icontains=query)
-            )
+            filtered_packages = TourPackage.objects.none()
+            
+            filtered_packages = filtered_packages | packages.filter(name__icontains=query)
+            filtered_packages = filtered_packages | packages.filter(description__icontains=query)
+            
+            packages = filtered_packages.distinct()
 
         if duration:
             packages = packages.filter(duration=duration)
@@ -368,7 +379,7 @@ def create_accommodation_booking(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # คำนวณจำนวนคืน
+        # คำนวดจำนวนคืน
         check_in = datetime.strptime(check_in_date, '%Y-%m-%d').date()
         check_out = datetime.strptime(check_out_date, '%Y-%m-%d').date()
         nights = (check_out - check_in).days
@@ -446,7 +457,7 @@ def create_tour_booking(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # คำนวณราคา
+        # คำนวดราคา
         total_amount = (tour_package.price_adult * adults) + \
             (tour_package.price_child * children)
 
