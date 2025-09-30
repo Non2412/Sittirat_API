@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
-from django.db.models import Count, Sum, Avg
+from django.db.models import Count, Sum, Avg, QuerySet
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.db.models.functions import TruncDate
