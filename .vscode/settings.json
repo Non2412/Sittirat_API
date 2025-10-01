@@ -1,0 +1,22 @@
+{
+    "python.analysis.extraPaths": [
+        "./",
+        "./api"
+    ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.indexing": true,
+    "python.defaultInterpreterPath": "python",
+    "python.languageServer": "Pylance",
+    "django.snippets.disable": false,
+    "emmet.includeLanguages": {
+        "django-html": "html"
+    },
+    "files.associations": {
+        "**/*.html": "html",
+        "**/templates/**/*.html": "django-html",
+        "**/templates/**/*": "django-txt",
+        "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+    }
+}
