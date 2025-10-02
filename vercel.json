@@ -2,30 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/wsgi.py",
-      "use": "@vercel/python",
-      "config": {
-        "runtime": "python3.9"
-      }
+      "src": "index.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "backend/wsgi.py"
-    },
-    {
       "src": "/(.*)",
-      "dest": "backend/wsgi.py"
+      "dest": "index.py"
     }
   ],
   "env": {
     "DJANGO_SETTINGS_MODULE": "backend.settings",
     "VERCEL_ENV": "production"
-  },
-  "functions": {
-    "backend/wsgi.py": {
-      "maxDuration": 30
-    }
   }
 }
