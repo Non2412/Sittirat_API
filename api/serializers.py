@@ -52,7 +52,6 @@ class AccommodationSummarySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'type', 'type_display', 'district', 'price_per_night', 'available_rooms', 'rating', 'is_active']
 
 
-# ...existing code...
 class TourPackageSerializer(serializers.ModelSerializer):
     duration_display = serializers.CharField(source='get_duration_display', read_only=True)
     attractions = TouristAttractionSummarySerializer(many=True, read_only=True)
@@ -62,7 +61,7 @@ class TourPackageSerializer(serializers.ModelSerializer):
         write_only=True,
         source='attractions'
     )
-# ...existing code...
+
     class Meta:
         model = TourPackage
         fields = '__all__'
@@ -85,10 +84,30 @@ class UserSerializer(serializers.ModelSerializer):
 
 class TouristSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    user_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Tourist
         fields = '__all__'
+    
+    def validate_user_id(self, value):
+        """ตรวจสอบว่า user_id มีอยู่ใน database"""
+        try:
+            user = User.objects.get(id=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(f"ไม่พบ User ที่มี id = {value}")
+        
+        # ตรวจสอบว่า user นี้มี Tourist เชื่อมอยู่แล้วหรือไม่
+        if Tourist.objects.filter(user=user).exists():
+            raise serializers.ValidationError(f"User นี้มี Tourist profile อยู่แล้ว")
+        
+        return value
+    
+    def create(self, validated_data):
+        user_id = validated_data.pop('user_id')
+        user = User.objects.get(id=user_id)
+        tourist = Tourist.objects.create(user=user, **validated_data)
+        return tourist
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -132,7 +151,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     def validate(self, data):
         # ต้องระบุอย่างน้อย 1 ใน 3: attraction, accommodation, หรือ tour_package
         if not any([data.get('attraction'), data.get('accommodation'), data.get('tour_package')]):
-            raise serializers.ValidationError("ต้องระบุสถานที่ท่องเที่ยว ที่พัก หรือแพ็คเกจทัวร์อย่างน้อย 1 อย่าง")
+            raise serializers.ValidationError("ต้องระบุสถานที่ท่องเที่ยว ที่พัก หรือแพ็คเกจทัวร์อย่างน้อง 1 อย่าง")
 
         return data
 
