@@ -26,6 +26,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-^!7t5q&w5mc*9-e4f!^ix
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
+# Special handling for Vercel
+if os.environ.get('VERCEL_ENV'):
+    DEBUG = False
+
 ALLOWED_HOSTS = ['*']  # เพิ่ม * เพื่อให้ Vercel เข้าถึงได้
 
 
@@ -80,14 +84,19 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # ใช้ environment variable หรือ default database
-if os.environ.get('VERCEL'):
+if os.environ.get('VERCEL_ENV') or os.environ.get('VERCEL'):
+    # Vercel serverless environment
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': '/tmp/db.sqlite3',
         }
     }
+    # Additional Vercel-specific settings
+    STATIC_ROOT = '/tmp/static/'
+    MEDIA_ROOT = '/tmp/media/'
 else:
+    # Local development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

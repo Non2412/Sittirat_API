@@ -21,11 +21,13 @@
     }
   ],
   "env": {
-    "DJANGO_SETTINGS_MODULE": "backend.settings"
+    "DJANGO_SETTINGS_MODULE": "backend.settings",
+    "VERCEL_ENV": "production",
+    "DEBUG": "False"
   },
   "functions": {
     "backend/wsgi.py": {
-      "maxDuration": 10
+      "maxDuration": 30
     }
   }
 }
