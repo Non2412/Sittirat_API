@@ -2,18 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/wsgi.py",
+      "src": "api_simple.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "backend/wsgi.py"
+      "dest": "api_simple.py"
     }
-  ],
-  "env": {
-    "DJANGO_SETTINGS_MODULE": "backend.settings",
-    "VERCEL_ENV": "production"
-  }
+  ]
 }
