@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
-from .auth_views import register, login_view  
+from .auth_serializers import register, login_view  
 
 router = DefaultRouter()
 router.register(r'attractions', views.TouristAttractionViewSet)

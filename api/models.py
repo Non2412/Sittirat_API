@@ -1,7 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.contrib.auth.password_validation import validate_password
+
+
+# Thai phone number validator
+thai_phone_validator = RegexValidator(
+    regex=r'^(\+66|0)[0-9]{8,9}$',
+    message='กรุณากรอกหมายเลขโทรศัพท์ไทยที่ถูกต้อง เช่น 081-234-5678 หรือ +66812345678'
+)
+
+# Thai ID card validator  
+thai_id_validator = RegexValidator(
+    regex=r'^[0-9]{13}$',
+    message='เลขบัตรประชาชนต้องเป็นตัวเลข 13 หลัก'
+)
 
 
 class TouristAttraction(models.Model):
@@ -24,7 +37,7 @@ class TouristAttraction(models.Model):
     longitude = models.FloatField(null=True, blank=True, verbose_name="ลองจิจูด")
     opening_hours = models.CharField(max_length=100, blank=True, verbose_name="เวลาเปิด-ปิด")
     entrance_fee = models.DecimalField(max_digits=8, decimal_places=2, default=0, verbose_name="ค่าเข้าชม")
-    phone = models.CharField(max_length=15, blank=True, verbose_name="เบอร์โทร")
+    phone = models.CharField(max_length=15, blank=True, validators=[thai_phone_validator], verbose_name="เบอร์โทร")
     website = models.URLField(blank=True, verbose_name="เว็บไซต์")
     is_active = models.BooleanField(default=True, verbose_name="เปิดให้เข้าชม")
     rating = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(5)], verbose_name="คะแนน")
@@ -54,7 +67,7 @@ class Accommodation(models.Model):
     description = models.TextField(verbose_name="รายละเอียด")
     district = models.CharField(max_length=50, verbose_name="อำเภอ")
     address = models.TextField(verbose_name="ที่อยู่")
-    phone = models.CharField(max_length=15, verbose_name="เบอร์โทร")
+    phone = models.CharField(max_length=15, validators=[thai_phone_validator], verbose_name="เบอร์โทร")
     email = models.EmailField(blank=True, verbose_name="อีเมล")
     website = models.URLField(blank=True, verbose_name="เว็บไซต์")
     price_per_night = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="ราคาต่อคืน (เริ่มต้น)")
@@ -132,11 +145,11 @@ class TourPackage(models.Model):
 
 class Tourist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='api_tourist')
-    phone = models.CharField(max_length=15, verbose_name="เบอร์โทร")
-    id_card = models.CharField(max_length=13, blank=True, verbose_name="เลขบัตรประชาชน")
+    phone = models.CharField(max_length=15, validators=[thai_phone_validator], verbose_name="เบอร์โทร")
+    id_card = models.CharField(max_length=13, blank=True, validators=[thai_id_validator], verbose_name="เลขบัตรประชาชน")
     address = models.TextField(verbose_name="ที่อยู่")
     emergency_contact = models.CharField(max_length=100, blank=True, verbose_name="ผู้ติดต่อฉุกเฉิน")
-    emergency_phone = models.CharField(max_length=15, blank=True, verbose_name="เบอร์ติดต่อฉุกเฉิน")
+    emergency_phone = models.CharField(max_length=15, blank=True, validators=[thai_phone_validator], verbose_name="เบอร์ติดต่อฉุกเฉิน")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
