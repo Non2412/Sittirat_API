@@ -9,36 +9,43 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
 
 import os
 import sys
-from django.core.wsgi import get_wsgi_application
+from pathlib import Path
 
-# Vercel environment detection and configuration
-if os.environ.get('VERCEL_ENV'):
-    # Set environment variables for Vercel
-    os.environ.setdefault('VERCEL', '1')
-    os.environ.setdefault('DEBUG', 'False')
-    
-    # Add the project directory to Python path for Vercel
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_dir = os.path.dirname(current_dir)
-    sys.path.insert(0, project_dir)
-
+# Set the settings module
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
-# Create the WSGI application
-application = get_wsgi_application()
-
-# Vercel requires 'handler' or 'app' variable
-handler = application
-app = application
-
-# Auto-migrate for Vercel (since it's stateless)
+# Vercel specific configuration
 if os.environ.get('VERCEL_ENV'):
-    try:
-        from django.core.management import execute_from_command_line
-        execute_from_command_line(['manage.py', 'migrate', '--run-syncdb'])
-    except Exception as e:
-        # Ignore migration errors in serverless environment
-        pass
+    # Add the project root to Python path
+    project_root = Path(__file__).resolve().parent.parent
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
 
-# For Vercel deployment
-app = application
+# Import Django and create WSGI application
+try:
+    from django.core.wsgi import get_wsgi_application
+    from django.core.management import call_command
+    
+    # Get the application
+    application = get_wsgi_application()
+    
+    # Vercel needs these variable names
+    app = application
+    handler = application
+    
+    # Run migrations only in Vercel environment
+    if os.environ.get('VERCEL_ENV'):
+        try:
+            call_command('migrate', verbosity=0, interactive=False)
+        except Exception:
+            # Ignore migration errors in serverless
+            pass
+            
+except Exception as e:
+    # Fallback for import errors
+    def application(environ, start_response):
+        start_response('500 Internal Server Error', [('Content-Type', 'text/plain')])
+        return [f'Django import error: {str(e)}'.encode('utf-8')]
+    
+    app = application
+    handler = application
