@@ -21,16 +21,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-^!7t5q&w5mc*9-e4f!^ixi(um^j8igd-y^s60m^3(h52w8qthm')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-vercel-sittirat-api-2024-production-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Special handling for Vercel
 if os.environ.get('VERCEL_ENV'):
     DEBUG = False
 
 ALLOWED_HOSTS = ['*']  # เพิ่ม * เพื่อให้ Vercel เข้าถึงได้
+
+# Disable CSRF for API (since it's stateless)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 
 # Application definition
@@ -92,9 +99,6 @@ if os.environ.get('VERCEL_ENV') or os.environ.get('VERCEL'):
             'NAME': '/tmp/db.sqlite3',
         }
     }
-    # Additional Vercel-specific settings
-    STATIC_ROOT = '/tmp/static/'
-    MEDIA_ROOT = '/tmp/media/'
 else:
     # Local development
     DATABASES = {
@@ -139,8 +143,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = '/tmp/static'  # เพิ่ม STATIC_ROOT สำหรับ Vercel
+STATIC_URL = '/static/'
+
+# Static files configuration for Vercel
+if os.environ.get('VERCEL_ENV'):
+    STATIC_ROOT = '/tmp/static/'
+    MEDIA_ROOT = '/tmp/media/'
+else:
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -167,7 +180,33 @@ REST_FRAMEWORK = {
 # CORS settings (สำหรับ frontend)
 CORS_ALLOW_ALL_ORIGINS = True  # เฉพาะ development
 CORS_ALLOW_CREDENTIALS = True
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",  # สำหรับ React
-#     "http://127.0.0.1:3000",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "https://sittirat-api.vercel.app",
+    "http://localhost:3000",  # สำหรับ React
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+# Logging configuration for debugging
+if os.environ.get('VERCEL_ENV'):
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+        },
+    }
