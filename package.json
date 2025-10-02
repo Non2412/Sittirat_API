@@ -1,14 +1,12 @@
 {
-  "name": "my-api",
+  "name": "sittirat-api",
   "version": "1.0.0",
+  "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "start": "node index.js",
+    "dev": "node index.js"
   },
   "dependencies": {
-    "next": "13.x",
-    "react": "18.x",
-    "react-dom": "18.x"
+    "express": "^4.18.2"
   }
 }
