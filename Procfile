@@ -1,2 +1,1 @@
-release: python3 manage.py migrate --noinput
-web: python3 manage.py collectstatic --noinput && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT
+web: gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT --timeout 120
