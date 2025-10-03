@@ -1,2 +1,2 @@
-release: python manage.py migrate --noinput
-web: python manage.py collectstatic --noinput && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT
+release: python3 manage.py migrate --noinput
+web: python3 manage.py collectstatic --noinput && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT
