@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -146,12 +149,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Static files configuration for Vercel
-if os.environ.get('VERCEL_ENV'):
-    STATIC_ROOT = '/tmp/static/'
-    MEDIA_ROOT = '/tmp/media/'
-else:
-    STATIC_ROOT = BASE_DIR / 'staticfiles'
-    MEDIA_ROOT = BASE_DIR / 'media'
+STATIC_ROOT = '/tmp/static' if os.environ.get('VERCEL_ENV') else str(BASE_DIR / 'staticfiles')
+MEDIA_ROOT = '/tmp/media' if os.environ.get('VERCEL_ENV') else str(BASE_DIR / 'media')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 
