@@ -1,7 +1,28 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from . import views
 from .auth_serializers import register, login_view  
+
+@api_view(['GET'])
+def api_root(request):
+    return Response({
+        'message': 'Sittirat Tourism API',
+        'version': '1.0.0',
+        'endpoints': {
+            'attractions': '/api/attractions/',
+            'accommodations': '/api/accommodations/',
+            'tour-packages': '/api/tour-packages/',
+            'tourists': '/api/tourists/',
+            'bookings': '/api/bookings/',
+            'reviews': '/api/reviews/',
+            'auth': {
+                'register': '/api/auth/register/',
+                'login': '/api/auth/login/'
+            }
+        }
+    })
 
 router = DefaultRouter()
 router.register(r'attractions', views.TouristAttractionViewSet)
@@ -12,7 +33,10 @@ router.register(r'bookings', views.BookingViewSet)
 router.register(r'reviews', views.ReviewViewSet)
 
 urlpatterns = [
-    # Router URLs
+    # API Root
+    path('', api_root, name='api-root'),
+    
+    # Router URLs  
     path('', include(router.urls)),
     
     # Authentication URLs

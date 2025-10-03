@@ -15,13 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from django.contrib import admin
-admin.site.site_header = "ระบบจัดการท่องเที่ยว ศรีสะเกษ"
-admin.site.site_title = "Admin ศรีสะเกษ"
-admin.site.index_title = "แผงควบคุมผู้ดูแล"
+from django.urls import path
+from django.http import JsonResponse
+
+def simple_api(request):
+    return JsonResponse({
+        'message': 'Sittirat Tourism API - Working!',
+        'status': 'success',
+        'version': '1.0.0'
+    })
 
 urlpatterns = [
+    path('', simple_api),
+    path('api/', simple_api),
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),  # เพิ่ม API routes
 ]

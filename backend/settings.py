@@ -27,17 +27,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-vercel-sittirat-api-2024-production-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = True  # ชั่วคราวเพื่อดู error
 
-# Special handling for Vercel
-if os.environ.get('VERCEL_ENV'):
-    DEBUG = False
+# Special handling for Railway and Vercel
+# if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('VERCEL_ENV'):
+#     DEBUG = False
 
-ALLOWED_HOSTS = ['*']  # เพิ่ม * เพื่อให้ Vercel เข้าถึงได้
+ALLOWED_HOSTS = ['*', 'sittirapi-production.up.railway.app']  # เพิ่ม Railway domain
 
 # Disable CSRF for API (since it's stateless)
 CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
+    'https://*.railway.app',
+    'https://sittirapi-production.up.railway.app',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
 ]
@@ -52,10 +54,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',  # เพิ่มสำหรับ REST API
-    'rest_framework.authtoken',  # เพิ่มสำหรับ Token Authentication
-    'corsheaders',     # เพิ่มสำหรับ CORS (ถ้าจะใช้กับ frontend)
-    'api',             # เพิ่ม app ที่เราจะสร้าง
+    # 'rest_framework',  # ปิดชั่วคราว
+    # 'rest_framework.authtoken',  # ปิดชั่วคราว
+    # 'corsheaders',     # ปิดชั่วคราว
+    # 'api',             # ปิดชั่วคราว
 ]
 
 MIDDLEWARE = [
@@ -94,24 +96,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-if os.environ.get('VERCEL_ENV'):
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('POSTGRES_URL'),
-            conn_max_age=600,
-            ssl_require=True
-        )
+# Database configuration - use SQLite for now
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 
 # Password validation
@@ -150,8 +141,16 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# Static files configuration for Vercel
-STATIC_ROOT = '/tmp/static' if os.environ.get('VERCEL_ENV') else str(BASE_DIR / 'staticfiles')
+# Static files configuration for production
+if os.environ.get('RAILWAY_ENVIRONMENT'):
+    STATIC_ROOT = str(BASE_DIR / 'staticfiles')
+    MEDIA_ROOT = str(BASE_DIR / 'media')
+elif os.environ.get('VERCEL_ENV'):
+    STATIC_ROOT = '/tmp/static'
+    MEDIA_ROOT = '/tmp/media'
+else:
+    STATIC_ROOT = str(BASE_DIR / 'staticfiles')
+    MEDIA_ROOT = str(BASE_DIR / 'media')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
