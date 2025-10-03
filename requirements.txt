@@ -1,9 +1,8 @@
-# No dependencies needed for basic HTTP server
-Django==5.1.6
+Django>=5.0,<6.0
 gunicorn
 whitenoise
 dj-database-url
-psycopg2-binary
+psycopg2
 python-dotenv
 djangorestframework
-corsheaders
+django-cors-headers
