@@ -33,12 +33,13 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('VERCEL_ENV'):
     DEBUG = False
 
-ALLOWED_HOSTS = ['*']  # เพิ่ม * เพื่อให้ Vercel เข้าถึงได้
+ALLOWED_HOSTS = ['*', 'sittirapi-production.up.railway.app']  # เพิ่ม Railway domain
 
 # Disable CSRF for API (since it's stateless)
 CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
     'https://*.railway.app',
+    'https://sittirapi-production.up.railway.app',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
 ]
