@@ -27,11 +27,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-vercel-sittirat-api-2024-production-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = True  # ชั่วคราวเพื่อดู error
 
 # Special handling for Railway and Vercel
-if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('VERCEL_ENV'):
-    DEBUG = False
+# if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('VERCEL_ENV'):
+#     DEBUG = False
 
 ALLOWED_HOSTS = ['*', 'sittirapi-production.up.railway.app']  # เพิ่ม Railway domain
 
@@ -96,35 +96,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Database configuration for different environments
-if os.environ.get('DATABASE_URL'):
-    # Railway or production environment with DATABASE_URL
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
+# Database configuration - use SQLite for now
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-elif os.environ.get('POSTGRES_URL'):
-    # Vercel environment with POSTGRES_URL
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('POSTGRES_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
-else:
-    # Local development
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 
 # Password validation
