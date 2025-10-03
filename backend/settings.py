@@ -54,10 +54,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',  # เพิ่มสำหรับ REST API
-    'rest_framework.authtoken',  # เพิ่มสำหรับ Token Authentication
-    'corsheaders',     # เพิ่มสำหรับ CORS (ถ้าจะใช้กับ frontend)
-    'api',             # เพิ่ม app ที่เราจะสร้าง
+    # 'rest_framework',  # ปิดชั่วคราว
+    # 'rest_framework.authtoken',  # ปิดชั่วคราว
+    # 'corsheaders',     # ปิดชั่วคราว
+    # 'api',             # ปิดชั่วคราว
 ]
 
 MIDDLEWARE = [
