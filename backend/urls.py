@@ -16,12 +16,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib import admin
+from django.http import JsonResponse
+
+def api_root(request):
+    return JsonResponse({
+        'message': 'Welcome to Sittirat Tourism API',
+        'version': '1.0.0',
+        'endpoints': {
+            'api': '/api/',
+            'admin': '/admin/',
+            'docs': 'API documentation available at /api/'
+        }
+    })
+
 admin.site.site_header = "ระบบจัดการท่องเที่ยว ศรีสะเกษ"
 admin.site.site_title = "Admin ศรีสะเกษ"
 admin.site.index_title = "แผงควบคุมผู้ดูแล"
 
 urlpatterns = [
+    path('', api_root, name='api_root'),  # เพิ่ม root path
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),  # เพิ่ม API routes
 ]
