@@ -97,17 +97,18 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # ใช้ environment variable หรือ default database
 if os.environ.get('VERCEL_ENV') or os.environ.get('VERCEL'):
     # Vercel serverless environment
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'URL': os.environ.get('POSTGRES_URL'),
-            'NAME': os.environ.get('POSTGRES_DATABASE'),
-            'USER': os.environ.get('POSTGRES_USER'),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-            'HOST': os.environ.get('POSTGRES_HOST'),
-            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+    if os.environ.get('POSTGRES_URL'):
+        # Parse database URL
+        import dj_database_url
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=os.environ.get('POSTGRES_URL'),
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
         }
-    }
+    else:
+        raise Exception("POSTGRES_URL environment variable is not set")
 else:
     # Local development
     DATABASES = {
